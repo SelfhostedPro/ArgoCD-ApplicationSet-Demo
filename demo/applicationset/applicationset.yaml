@@ -21,6 +21,8 @@ spec:
       annotations:
         # >>> Allows argo-image-update to update the image specified in config.json in each app's directory (got the images used in each deployment manifest)<<<
         argocd-image-updater.argoproj.io/image-list: '{{ image }}'
+        # >>> Only allows the tag specified to be used for updating <<<
+        argocd-image-updater.argoproj.io/{{ image }}.allow-tags: 'regexp:^{{ tag }}$'
         # >>> Updates to the latest version of a specific tag <<<
         argocd-image-updater.argoproj.io/{{ image }}.update-strategy: digest
         # >>> Using the argocd writeback method as I'm unsure of the structure of your git repo but you may be able to use git instead: https://argocd-image-updater.readthedocs.io/en/stable/basics/update-methods/#argocd-write-back-method <<<
