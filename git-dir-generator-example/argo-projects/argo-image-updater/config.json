@@ -1,0 +1,3 @@
+{
+    "images": ["argoprojlabs/argocd-image-updater:v0.11.3"]
+}
