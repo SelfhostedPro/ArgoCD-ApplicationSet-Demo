@@ -11,11 +11,20 @@ spec:
         directories:
           # here it will read the paths under configs and the subpaths under the config paths
           - path: demo/configs/*/*
+        files:
+          - path: demo/configs/*/*/config.yaml
   template:
     metadata:
       namespace: argocd
       # you can use the path strings with / delimiter as variables
       name: "{{path[2]}}-{{path.basename}}"
+      annotations:
+        # >>> Allows argo-image-update to update the image specified in config.json in each app's directory (got the images used in each deployment manifest)<<<
+        argocd-image-updater.argoproj.io/image-list: '{{ image }}'
+        # >>> Updates to the latest version of a specific tag <<<
+        argocd-image-updater.argoproj.io/{{ image }}.update-strategy: digest
+        # >>> Using the argocd writeback method as I'm unsure of the structure of your git repo but you may be able to use git instead: https://argocd-image-updater.readthedocs.io/en/stable/basics/update-methods/#argocd-write-back-method <<<
+        argocd-image-updater.argoproj.io/write-back-method: 'argocd'
     spec:
       project: default
       source:
