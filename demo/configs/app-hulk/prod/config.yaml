@@ -1,2 +1,1 @@
-image: amralaayassen/helm-app
-tag: prod
+image: 'amralaayassen/helm-app: test'

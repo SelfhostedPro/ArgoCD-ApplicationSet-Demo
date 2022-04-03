@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: appname
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/avetta/argocd-helm.git
+        revision: argocd-helm
+        directories:
+          # here it will read the paths under configs and the subpaths under the config paths
+          - path: avetta/configs/*/dot/
+        files:
+          - path: avetta/configs/*/dot/config.yaml
+  template:
+    metadata:
+      namespace: argocd
+      # you can use the path strings with / delimiter as variables
+      name: "{{path[2]}}"
+      annotations:
+        argocd-image-updater.argoproj.io/image-list: app={{ image }}
+        argocd-image-updater.argoproj.io/app.update-strategy: digest
+        argocd-image-updater.argoproj.io/write-back-method: 'git'
+    spec:
+      project: default
+      source:
+        helm:
+          # specify different values file based on directories variables
+          valueFiles:
+            - "configs/{{path[2]}}/{{path.basename}}/values.yaml"
+            - "configs/{{path[2]}}/values.yaml"
+        path: avetta
+        repoURL: https://github.com/avetta/argocd-helm.git
+        targetRevision: argocd-helm
+      syncPolicy:
+        automated:
+          prune: true
+      destination:
+        # specify different destinations
+        namespace: default
+        server: https://kubernetes.default.svc
