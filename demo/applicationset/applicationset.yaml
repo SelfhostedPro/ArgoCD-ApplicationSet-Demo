@@ -8,21 +8,16 @@ spec:
     - git:
         repoURL: https://github.com/AmrAlaaYassen/ArgoCD-ApplicationSet-Demo.git
         revision: HEAD
-        directories:
-          # here it will read the paths under configs and the subpaths under the config paths
-          - path: demo/configs/*/*
         files:
           - path: demo/configs/*/*/config.yaml
   template:
     metadata:
       namespace: argocd
       # you can use the path strings with / delimiter as variables
-      name: "{{path[2]}}-{{path.basename}}"
+      name: "{{name}}-{{environment}}"
       annotations:
         # >>> Allows argo-image-update to update the image specified in config.json in each app's directory (got the images used in each deployment manifest)<<<
-        - argocd-image-updater.argoproj.io/image-list: 'app={{ image }}:{{ tag }}'
-        # >>> Only allows the tag specified to be used for updating <<<
-        - argocd-image-updater.argoproj.io/app.allow-tags: 'regexp:^{{ tag }}$'
+        - argocd-image-updater.argoproj.io/image-list: 'app={{image}}'
         # >>> Updates to the latest version of a specific tag <<<
         - argocd-image-updater.argoproj.io/app.update-strategy: digest
         # >>> Using the git writeback method as it's required for applicationsets: https://github.com/argoproj-labs/argocd-image-updater/issues/400 <<<
@@ -33,7 +28,7 @@ spec:
         helm:
           # specify different values file based on directories variables
           valueFiles:
-            - "configs/{{path[2]}}/{{path.basename}}/values.yaml"
+            - "configs/{{path[2]}}/{{environment}}/values.yaml"
             - "configs/{{path[2]}}/values.yaml"
         path: demo
         repoURL: https://github.com/AmrAlaaYassen/ArgoCD-ApplicationSet-Demo.git
@@ -43,5 +38,5 @@ spec:
           prune: true
       destination:
         # specify different destinations
-        namespace: "{{path.basename}}"
+        namespace: "{{environment}}"
         server: https://kubernetes.default.svc

@@ -1,1 +1,4 @@
-image: 'amralaayassen/helm-app: test'
+image: 'amralaayassen/helm-app:test'
+path: configs/app-hulk/prod/
+environment: prod
+name: app-hulk
